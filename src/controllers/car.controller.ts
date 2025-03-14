@@ -14,16 +14,14 @@ class CarController {
     private readonly typeService: TypeService
   ) {}
   async #validateManufacturerId(id: number) {
-    const manufacturer = await this.manufacturerService.getManufacturerById(
-      id.toString()
-    );
+    const manufacturer = await this.manufacturerService.getManufacturerById(id);
     if (!manufacturer) {
       throw new BadRequestException('Invalid manufacturer id');
     }
   }
 
   async #validateModelId(id: number) {
-    const model = await this.modelService.getModelById(id.toString());
+    const model = await this.modelService.getModelById(id);
     if (!model) {
       throw new BadRequestException('Invalid model id');
     }
@@ -56,7 +54,7 @@ class CarController {
   }
 
   async #validateTypeId(id: number) {
-    const type = await this.typeService.getTypeById(id.toString());
+    const type = await this.typeService.getTypeById(id);
     if (!type) {
       throw new BadRequestException('Invalid type id');
     }

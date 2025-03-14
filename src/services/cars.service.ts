@@ -75,13 +75,13 @@ class CarsService {
         images: (File | string)[];
       }
   ): Promise<Car> {
-    const { data: carData } = carSchema.safeParse(data);
+    const carData = carSchema.parse(data);
 
     const car = await this.carsRepository.createCar({
       ...carData,
       userId: data.userId,
     } as Prisma.CarUncheckedCreateInput);
-    const { data: carDetailsData } = carDetailsSchema.safeParse(data);
+    const carDetailsData = carDetailsSchema.parse(data);
 
     const carDetails = await this.carDetailsRepository.createCarDetails({
       ...(carDetailsData as Prisma.CarDetailsUncheckedCreateInput),
