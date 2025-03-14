@@ -1,0 +1,7 @@
+model CarDetails {
+  id          Int    @id @default(autoincrement())
+  carId       Int    @unique
+  description String
+  year        Int
+  car         Car    @relation(fields: [carId], references: [id])
+}

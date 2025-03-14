@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model CarDetails {
+  id          Int    @id @default(autoincrement())
+  carId       Int    @unique
+  description String
+  year        Int
+  car         Car    @relation(fields: [carId], references: [id])
+}
+model CarImage {
+  id    Int    @id @default(autoincrement())
+  carId Int
+  image String
+  car   Car    @relation(fields: [carId], references: [id])
+}
+model Car {
+  id             Int          @id @default(autoincrement())
+  manufacturerId Int
+  modelId        Int
+  typeId         Int
+  price          Float
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt()
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  model          Model        @relation(fields: [modelId], references: [id])
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  type           Type         @relation(fields: [typeId], references: [id])
+  details        CarDetails?
+  images         CarImage[]
+}
+model Manufacturer {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  models Model[]
+  cars   Car[]
+}
+model Model {
+  id             Int          @id @default(autoincrement())
+  name           String       @unique
+  manufacturerId Int
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  cars           Car[]
+
+  @@unique([manufacturerId, name])
+}
+model Type {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  cars Car[]
+}
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cars      Car[]
+}

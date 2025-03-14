@@ -1,0 +1,13 @@
+FROM --platform=linux/x86_64 node:22
+RUN apt-get update -y && \
+    apt-get upgrade -y
+
+RUN apt-get install -y unzip sudo build-essential
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN sudo ./aws/install
+
+WORKDIR /home/app
+
+COPY . .

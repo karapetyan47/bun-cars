@@ -1,0 +1,16 @@
+model Car {
+  id             Int          @id @default(autoincrement())
+  manufacturerId Int
+  modelId        Int
+  typeId         Int
+  price          Float
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt()
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  model          Model        @relation(fields: [modelId], references: [id])
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  type           Type         @relation(fields: [typeId], references: [id])
+  details        CarDetails?
+  images         CarImage[]
+}

@@ -1,0 +1,9 @@
+model Model {
+  id             Int          @id @default(autoincrement())
+  name           String       @unique
+  manufacturerId Int
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  cars           Car[]
+
+  @@unique([manufacturerId, name])
+}

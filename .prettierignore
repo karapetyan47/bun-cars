@@ -1,0 +1,5 @@
+# Ignore artifacts:
+build
+coverage
+s3
+s3server

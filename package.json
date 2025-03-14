@@ -1,0 +1,47 @@
+{
+  "name": "auto-am",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run ./src/index.ts",
+    "prepare": "husky",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "merge-schemas": "./merge-schemas.sh",
+    "generate-client": "bun run merge-schemas && prisma generate",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma db push --force-reset",
+    "db:migrate": "prisma db push"
+  },
+  "prisma": {
+    "seed": "bun prisma/seeds/seed.js"
+  },
+  "lint-staged": {
+    "./src/**/*.{ts,tsx,json,md}": "bun run format --write --ignore-unknown",
+    "./src/**/*.{ts,tsx}": "bun run lint:fix"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.3",
+    "prisma": "^6.4.1",
+    "s3rver": "^3.7.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@prisma/client": "^6.4.1",
+    "jose": "^6.0.8",
+    "zod": "^3.24.2"
+  }
+}

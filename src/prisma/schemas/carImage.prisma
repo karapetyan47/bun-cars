@@ -1,0 +1,6 @@
+model CarImage {
+  id    Int    @id @default(autoincrement())
+  carId Int
+  image String
+  car   Car    @relation(fields: [carId], references: [id])
+}
