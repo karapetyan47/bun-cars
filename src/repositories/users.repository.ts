@@ -7,9 +7,9 @@ class UserRepository {
     return await this.prismaClient.user.create({ data });
   }
 
-  async getUserById(id: string): Promise<User | null> {
+  async getUserById(id: number): Promise<User | null> {
     return await this.prismaClient.user.findUnique({
-      where: { id: Number(id) },
+      where: { id },
     });
   }
 
@@ -18,17 +18,17 @@ class UserRepository {
   }
 
   async updateUser(
-    id: string,
+    id: number,
     data: Prisma.UserUpdateInput
   ): Promise<User | null> {
     return await this.prismaClient.user.update({
-      where: { id: Number(id) },
+      where: { id },
       data,
     });
   }
 
-  async deleteUser(id: string): Promise<User | null> {
-    return await this.prismaClient.user.delete({ where: { id: Number(id) } });
+  async deleteUser(id: number): Promise<User | null> {
+    return await this.prismaClient.user.delete({ where: { id } });
   }
 }
 

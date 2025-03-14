@@ -5,7 +5,6 @@ import type CarsService from '@/services/cars.service';
 import type ManufacturerService from '@/services/manufacturer.service';
 import type ModelService from '@/services/model.service';
 import type TypeService from '@/services/type.service';
-import type { BunRequest } from 'bun';
 
 class CarController {
   constructor(
@@ -30,35 +29,14 @@ class CarController {
     }
   }
 
-  async #validateTypeId(id: number) {
-    const type = await this.typeService.getTypeById(id.toString());
-    if (!type) {
-      throw new BadRequestException('Invalid type id');
-    }
-  }
-
-  async getCars() {
-    return await this.carService.getCars();
-  }
-
-  async getUserCars(data: BunRequest) {
-    return await this.carService.getUserCars(data.user.id);
-  }
-
-  async createCar(data: BunRequest) {
-    if (!data.body) {
-      throw new BadRequestException();
-    }
-
-    const formData = await data.formData();
-
+  async #validateCarData(formData: FormData) {
     const carJson = fdToJson(formData, {
-      manufacturerId: (v: string) => Number(v),
-      modelId: (v: string) => Number(v),
-      userId: (v: string) => Number(v),
-      typeId: (v: string) => Number(v),
-      price: (v: string) => Number(v),
-      year: (v: string) => Number(v),
+      manufacturerId: (v: FormDataEntryValue) => Number(v),
+      modelId: (v: FormDataEntryValue) => Number(v),
+      userId: (v: FormDataEntryValue) => Number(v),
+      typeId: (v: FormDataEntryValue) => Number(v),
+      price: (v: FormDataEntryValue) => Number(v),
+      year: (v: FormDataEntryValue) => Number(v),
     });
 
     const { success, data: validatedCarData } =
@@ -74,25 +52,55 @@ class CarController {
       this.#validateTypeId(validatedCarData.typeId),
     ]);
 
-    return await this.carService.createCar({
-      ...validatedCarData,
-      userId: data.user.id as number,
-      images: formData.getAll('images'),
-    });
+    return { ...validatedCarData, images: formData.getAll('images') };
   }
 
-  async updateCar(id: string, data: BunRequest) {
+  async #validateTypeId(id: number) {
+    const type = await this.typeService.getTypeById(id.toString());
+    if (!type) {
+      throw new BadRequestException('Invalid type id');
+    }
+  }
+
+  async getCars() {
+    return await this.carService.getCars();
+  }
+
+  async getUserCars(data: AuthenticatedRequest) {
+    return await this.carService.getUserCars(data.user.id);
+  }
+
+  async createCar(data: AuthenticatedRequest) {
     if (!data.body) {
       throw new BadRequestException();
     }
 
     const formData = await data.formData();
 
-    return await this.carService.updateCar(id, formData);
+    const carData = await this.#validateCarData(formData);
+
+    return await this.carService.createCar({
+      ...carData,
+      userId: data.user.id as number,
+    });
+  }
+
+  async updateCar(id: string, data: AuthenticatedRequest) {
+    if (!data.body) {
+      throw new BadRequestException();
+    }
+
+    const formData = await data.formData();
+    const carData = await this.#validateCarData(formData);
+
+    return await this.carService.updateCar(Number(id), {
+      ...carData,
+      userId: data.user.id,
+    });
   }
 
   async deleteCar(id: string) {
-    return await this.carService.deleteCar(id);
+    return await this.carService.deleteCar(Number(id));
   }
 }
 

@@ -1,28 +1,15 @@
 import type { IUser } from '@/core/entities/user';
 import { BadRequestException, NotFoundException } from '@/core/exceptions';
 import Aws3Instance from '@/core/lib/aws3';
+import {
+  registerSchema,
+  userUpdateSchema,
+  loginSchema,
+} from '@/core/schemas/user.shema';
 import { fdToJson } from '@/core/utils/fdToJson';
 import type UserService from '@/services/user.service';
 import type { User } from '@prisma/client';
 import type { BunRequest } from 'bun';
-import { z } from 'zod';
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8).max(100),
-});
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2).max(100),
-  })
-  .merge(loginSchema);
-
-const userUpdateSchema = z.object({
-  email: z.string().email().optional(),
-  name: z.string().min(2).max(100).optional(),
-  password: z.string().min(8).max(100).optional(),
-});
 
 class UserController {
   constructor(private readonly userService: UserService) {}
@@ -44,7 +31,7 @@ class UserController {
 
   async getUserById(id: string): Promise<IUser | null> {
     try {
-      return await this.userService.getUserById(id);
+      return await this.userService.getUserById(Number(id));
     } catch {
       throw new BadRequestException();
     }
@@ -86,7 +73,7 @@ class UserController {
 
     const body = await data.json();
 
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(Number(id));
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -96,11 +83,11 @@ class UserController {
       throw new BadRequestException('Invalid user data');
     }
 
-    return await this.userService.updateUser(id, validatedUser.data);
+    return await this.userService.updateUser(Number(id), validatedUser.data);
   }
 
   async deleteUser(id: string): Promise<IUser | null> {
-    return await this.userService.deleteUser(id);
+    return await this.userService.deleteUser(Number(id));
   }
 
   async loginUser(data: BunRequest): Promise<IUser | null> {

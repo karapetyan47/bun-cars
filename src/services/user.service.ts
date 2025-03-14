@@ -3,6 +3,7 @@ import { BadRequestException } from '@/core/exceptions';
 import Aws3Instance from '@/core/lib/aws3';
 import Jwt from '@/core/lib/jwt';
 import type { Prisma, User } from '@prisma/client';
+import Password from '@/core/lib/password';
 
 class UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -11,10 +12,7 @@ class UserService {
     user: Prisma.UserUncheckedCreateInput,
     avatar: string | File | null
   ): Promise<User | null> {
-    const hashPassword = await Bun.password.hash(user.password, {
-      algorithm: 'bcrypt',
-      cost: Number(Bun.env.PASSWORD_HASH_COST),
-    });
+    const hashPassword = await Password.hash(user.password);
 
     const userRecord = await this.userRepository.createUser({
       ...user,
@@ -31,7 +29,7 @@ class UserService {
     }
 
     const userRecordWithAvatar = await this.userRepository.updateUser(
-      userRecord.id.toString(),
+      userRecord.id,
       {
         avatar: userAvatar as string,
       }
@@ -40,7 +38,7 @@ class UserService {
     return userRecordWithAvatar;
   }
 
-  async getUserById(id: string): Promise<User | null> {
+  async getUserById(id: number): Promise<User | null> {
     return await this.userRepository.getUserById(id);
   }
 
@@ -49,13 +47,13 @@ class UserService {
   }
 
   async updateUser(
-    id: string,
+    id: number,
     user: Prisma.UserUncheckedUpdateInput
   ): Promise<User | null> {
     return await this.userRepository.updateUser(id, user);
   }
 
-  async deleteUser(id: string): Promise<User | null> {
+  async deleteUser(id: number): Promise<User | null> {
     return await this.userRepository.deleteUser(id);
   }
 
@@ -66,7 +64,7 @@ class UserService {
     },
     userRecord: User
   ): Promise<(User & { token: string }) | null> {
-    const isPasswordValid = await Bun.password.verify(
+    const isPasswordValid = await Password.verify(
       user.password,
       userRecord.password
     );

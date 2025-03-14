@@ -59,11 +59,11 @@ class CarsService {
     return this.#serializeCars(cars);
   }
 
-  async getCar(id: string): Promise<Car | null> {
+  async getCar(id: number): Promise<Car | null> {
     return await this.carsRepository.getCarWithDetails(id);
   }
 
-  async getUserCars(userId: string): Promise<Car[]> {
+  async getUserCars(userId: number): Promise<Car[]> {
     const cars = await this.carsRepository.getUserCarsWithDetails(userId);
     return this.#serializeCars(cars);
   }
@@ -108,8 +108,8 @@ class CarsService {
         images: (File | string)[];
       }
   ): Promise<Car | null> {
-    const { data: carData } = carSchema.safeParse(data);
-    const { data: carDetailsData } = carDetailsSchema.safeParse(data);
+    const carData = carSchema.parse(data);
+    const carDetailsData = carDetailsSchema.parse(data);
 
     const carPromises: Promise<any>[] = [
       this.carsRepository.updateCar(id, carData as Prisma.CarUpdateInput),
@@ -129,15 +129,16 @@ class CarsService {
 
     const [car, carDetails, images] = await Promise.all(carPromises);
     this.#mergeDetailsToCar(car, carDetails);
+
     if (images?.length > 0) {
       this.#mergeImagesToCar(car, this.#serializeImages(images));
     }
 
-    return this.carsRepository.updateCar(id, data);
+    return car;
   }
 
   async deleteCar(id: number): Promise<Car | null> {
-    return this.carsRepository.deleteCar(id);
+    return await this.carsRepository.deleteCar(id);
   }
 }
 

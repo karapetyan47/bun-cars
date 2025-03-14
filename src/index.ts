@@ -1,6 +1,7 @@
 import { initPrisma } from '@/core/db/prisma.db';
 import initRoutes from '@/routes/index';
 import type { Exception } from '@/core/exceptions';
+import '@/core/types.d.ts';
 
 const PORT = Bun.env.PORT || 5000;
 
