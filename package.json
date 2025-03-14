@@ -16,7 +16,8 @@
     "db:migrate": "prisma db push"
   },
   "prisma": {
-    "seed": "bun prisma/seeds/seed.js"
+    "seed": "bun prisma/seeds/seed.js",
+    "schema": "src/prisma/schema.prisma"
   },
   "lint-staged": {
     "./src/**/*.{ts,tsx,json,md}": "bun run format --write --ignore-unknown",
