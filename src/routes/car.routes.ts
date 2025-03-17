@@ -1,14 +1,15 @@
 import type CarController from '@/controllers/car.controller';
 import { Auth } from '@/core/decorators/auth';
 import { Route, Router } from '@/core/decorators/router';
+import type { BunRequest } from 'bun';
 
 @Router('/cars')
 class CarRoutes {
   constructor(private readonly carController: CarController) {}
 
   @Route()
-  async getCars() {
-    const cars = await this.carController.getCars();
+  async getCars(req: BunRequest) {
+    const cars = await this.carController.getCars(req);
     return new Response(JSON.stringify(cars));
   }
 

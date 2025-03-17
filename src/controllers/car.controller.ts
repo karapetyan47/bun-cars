@@ -5,6 +5,7 @@ import type CarsService from '@/services/cars.service';
 import type ManufacturerService from '@/services/manufacturer.service';
 import type ModelService from '@/services/model.service';
 import type TypeService from '@/services/type.service';
+import type { BunRequest } from 'bun';
 
 class CarController {
   constructor(
@@ -60,40 +61,43 @@ class CarController {
     }
   }
 
-  async getCars() {
-    return await this.carService.getCars();
+  async getCars(req: BunRequest) {
+    const searchParams = new URL(req.url).searchParams;
+    const { page = 1, limit = 10 } = searchParams;
+    console.log('Request:', new URL(req.url).searchParams);
+    return await this.carService.getCars(page - 1, limit);
   }
 
-  async getUserCars(data: AuthenticatedRequest) {
-    return await this.carService.getUserCars(data.user.id);
+  async getUserCars(req: AuthenticatedRequest) {
+    return await this.carService.getUserCars(req.user.id);
   }
 
-  async createCar(data: AuthenticatedRequest) {
-    if (!data.body) {
+  async createCar(req: AuthenticatedRequest) {
+    if (!req.body) {
       throw new BadRequestException();
     }
 
-    const formData = await data.formData();
+    const formData = await req.formData();
 
     const carData = await this.#validateCarData(formData);
 
     return await this.carService.createCar({
       ...carData,
-      userId: data.user.id as number,
+      userId: req.user.id as number,
     });
   }
 
-  async updateCar(id: string, data: AuthenticatedRequest) {
-    if (!data.body) {
+  async updateCar(id: string, req: AuthenticatedRequest) {
+    if (!req.body) {
       throw new BadRequestException();
     }
 
-    const formData = await data.formData();
+    const formData = await req.formData();
     const carData = await this.#validateCarData(formData);
 
     return await this.carService.updateCar(Number(id), {
       ...carData,
-      userId: data.user.id,
+      userId: req.user.id,
     });
   }
 

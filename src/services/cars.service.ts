@@ -54,8 +54,9 @@ class CarsService {
     }));
   }
 
-  async getCars(): Promise<Car[]> {
-    const cars = await this.carsRepository.getCarsWithDetails();
+  async getCars(skip: number, take: number): Promise<Car[]> {
+    console.log(skip, take);
+    const cars = await this.carsRepository.getCarsWithDetails(skip, take);
     return this.#serializeCars(cars);
   }
 

@@ -63,9 +63,11 @@ class CarRepository {
     });
   }
 
-  async getCarsWithDetails(): Promise<Car[]> {
+  async getCarsWithDetails(skip: number, take: number): Promise<Car[]> {
     return await this.prismaClient.car.findMany({
       ...carReferances,
+      skip,
+      take,
     });
   }
 
